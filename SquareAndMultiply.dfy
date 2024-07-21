@@ -47,12 +47,12 @@ ensures r == exp(x, n)
 
 lemma factor(x: int, n: int, m: int)
   requires n > 0
-  requires m > 0
+  requires m >= 0
   ensures exp(x, n + m) == exp(x, n) * exp(x, m)
-{
-	if (m == 1)
+{	
+	if (m == 0)
 	{
-		assert(exp(x, n + 1) == exp(x,n)*x);
+		assert(exp(x, n + 0) == exp(x,n));
 	}
 	else
 	{
@@ -62,20 +62,50 @@ lemma factor(x: int, n: int, m: int)
 
 lemma factor2(x: int, n: int, m: int)
   requires n > 0
-  requires m > 0
+  requires m >= 0
   ensures exp(x, n * m) == exp(exp(x, n), m)
 {
-	if (m == 1)
+	if (m == 0)
 	{
-		assert(exp(x, n * 1) == exp(x,n));
+		assert(exp(x, 0) == 1);
 	}
 	else
 	{
 		assert(exp(x, n * m) == exp(x, n * (m-1) + n));		
-		factor(x, (m-1) * n, n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)
+		//factor(x, (m-1) * n, n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)
+		factor(x, n, (m-1) * n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)		
 		factor2(x, n, m - 1);	 // exp(x, n * (m-1)) = exp(exp(x, n), m - 1) -> 
 		assert(exp(exp(x, n), m - 1) * exp(x, n) == exp(exp(x, n), m));	//	exp(exp(x, n), m - 1) * exp(x, n) = exp(exp(x, n), m)
 	}
+}
+
+method IndexComp(n2: int, i2: int, j2 : int) returns (n: int, i: int, j : int)
+requires n2 > 1 
+requires i2 >= 1
+requires j2 >= 0  
+ensures n >= 1 
+ensures i >= 1
+ensures j >= 0 
+ensures isEven(n2) ==> j == j2 && n ==  n2 /2
+ensures !isEven(n2) ==> j == j2 + i2 && n ==  (n2 - 1) /2
+ensures i == i2 *2
+ensures i2*n2 +j2  == i*n +j   
+{
+	n := n2;
+	i := i2;
+	j := j2;
+    assert(i2*n2 +j2  == i*n +j);			  	
+	if (!isEven(n))
+	{
+		n := n - 1;
+		assert(j == j2);		
+		j := j + i;		
+		assert(j == j2 + i);
+    	assert(i2*n2 +j2  == i*n +j);		
+	}
+	n := n / 2;
+	i := i * 2;	 
+	assert(i2*n2 +j2  == i*n +j);			  	      
 }
 
 method FastExpr(x2: int, n2: int) returns (r: int)
@@ -84,37 +114,35 @@ ensures r == exp(x2, n2)
 {
     var x := x2;
 	var n := n2;
-	var nrest := 0;	
-    var y := 1;
-	var r2 := x * y;
-	var i := 1;
+    var y := 1;		
+	assert(y * exp(x, n) == exp(x2, n2));
     while (n > 1)
-		invariant n >= 1
-		invariant i >= 1
 		decreases n
-		invariant nrest + n == n2	
-		invariant exp(x2, nrest) * exp(x2, n) == exp(x2, n2)
-		invariant x == exp(x2, i)
-		invariant exp(x2, i * n) == exp(exp(x2, i), n)
-		invariant exp(x, n) == exp(x2, i * n)
-		//invariant y * exp(x, n) == exp(x2, n2) 	
-	{
-	  assert(exp(x2, i * n) == exp(exp(x2, i), n));		
+		invariant n > 0
+		invariant y * exp(x, n) == exp(x2, n2) 	
+	{			
       if (!isEven(n))
 	  {
-        y := x * y;
-        nrest, n := nrest + 1, n - 1;
+		factor2(x, 2, (n-1)/2);
+		assert(exp(x , n) == x * exp(x*x, (n-1)/2));
+		assert(y * exp(x , n) == y * x * exp(exp(x, 2), (n-1)/2));
+        y, x, n := x * y, x * x, (n-1)/2;	// y * exp(x , n) == y' * exp(x', (n - 1)/2)
+		// y' = x * y
+		// x' = x * x
+		// zz  	exp(x , n) = x * exp(x*x, (n-1)/2)
 	  }
-      x := x * x;
-      nrest, n := nrest + n / 2, n - n / 2;
-	  factor(x2, nrest, n); // exp(x2, nrest + n) = exp(x2, nrest) * exp(x2, n)
-	  factor(x2, i, i);// exp(x2, 2*i) = exp(x2, i) * exp(x2, i)
-	  factor2(x2, i, n);// exp(x2, i * n) == exp(exp(x2, i), n)
-	  assert(exp(x2, i * n) == exp(exp(x2, i), n));
-	  i := i * 2;
-	  factor2(x2, i, n);// exp(x2, i * n) == exp(exp(x2, i), n)	    
+	  else
+	  {    
+	    factor2(x, 2, n/2);
+		assert(exp(x , n) == exp(x*x, n/2));	
+		assert(y * exp(x , n) == y * exp(exp(x, 2), n/2));			
+      	y, x, n := y, x * x, n / 2;  // y * exp(x , n) -> y' * exp(x', n/2)
+		// y' = y
+		// x' = x * x  
+		// zz  	exp(x , n) = exp(x*x, n/2)
+	  }	   
 	}
-	assert(nrest + n == n2);
-	//assert(x * y == exp(x2, n2));
+	assert(n == 1);
     r:= x * y; 	
 }
+
