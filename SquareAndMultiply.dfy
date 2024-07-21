@@ -71,15 +71,6 @@ lemma factor2(x: int, n: int, m: int)
 	}
 	else
 	{
-		//assert(exp(x, n * m) == exp(x, n * 3));	
-		//assert(exp(x, n * m) == exp(x, n * (m-1) + n));	
-		//factor(x, n * (m-1), n); // exp(x, 2*n + n) = exp(x, n * (m-1)) * exp(x, n)
-		//factor2(x, n, m-1);
-		//factor(x, n, n); // exp(x, n + n) = exp(x, n) * exp(x, n)
-		//assert(exp(x, 2 * n) * exp(x, n) ==   exp(x, n) *  exp(x, n) *  exp(x, n));	
-		//assert(exp(x, n) * exp(x, n) * exp(x, n) == exp(exp(x, n), 2) * exp(x, n));
-		//assert(exp(exp(x, n), 2) * exp(x, n) == exp(exp(x, n), 3));
-		
 		assert(exp(x, n * m) == exp(x, n * (m-1) + n));		
 		factor(x, (m-1) * n, n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)
 		factor2(x, n, m - 1);	 // exp(x, n * (m-1)) = exp(exp(x, n), m - 1) -> 
