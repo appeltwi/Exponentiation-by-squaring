@@ -79,35 +79,6 @@ lemma factor2(x: int, n: int, m: int)
 	}
 }
 
-method IndexComp(n2: int, i2: int, j2 : int) returns (n: int, i: int, j : int)
-requires n2 > 1 
-requires i2 >= 1
-requires j2 >= 0  
-ensures n >= 1 
-ensures i >= 1
-ensures j >= 0 
-ensures isEven(n2) ==> j == j2 && n ==  n2 /2
-ensures !isEven(n2) ==> j == j2 + i2 && n ==  (n2 - 1) /2
-ensures i == i2 *2
-ensures i2*n2 +j2  == i*n +j   
-{
-	n := n2;
-	i := i2;
-	j := j2;
-    assert(i2*n2 +j2  == i*n +j);			  	
-	if (!isEven(n))
-	{
-		n := n - 1;
-		assert(j == j2);		
-		j := j + i;		
-		assert(j == j2 + i);
-    	assert(i2*n2 +j2  == i*n +j);		
-	}
-	n := n / 2;
-	i := i * 2;	 
-	assert(i2*n2 +j2  == i*n +j);			  	      
-}
-
 method FastExpr(x2: int, n2: int) returns (r: int)
 requires n2 > 0
 ensures r == exp(x2, n2)
@@ -143,6 +114,7 @@ ensures r == exp(x2, n2)
 	  }	   
 	}
 	assert(n == 1);
+	assert(x*y == exp(x2, n2));
     r:= x * y; 	
 }
 
