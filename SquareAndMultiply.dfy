@@ -45,7 +45,7 @@ ensures r == exp(x, n)
     }
 }
 
-lemma factor(x: int, n: int, m: int)
+lemma AssociativityLaw(x: int, n: int, m: int)
   requires n > 0
   requires m >= 0
   ensures exp(x, n + m) == exp(x, n) * exp(x, m)
@@ -56,11 +56,11 @@ lemma factor(x: int, n: int, m: int)
     }
     else
     {
-        factor(x, n, m - 1);
+        AssociativityLaw(x, n, m - 1);
     }
 }
 
-lemma factor2(x: int, n: int, m: int)
+lemma AssociativityLaw2(x: int, n: int, m: int)
   requires n > 0
   requires m >= 0
   ensures exp(x, n * m) == exp(exp(x, n), m)
@@ -72,9 +72,9 @@ lemma factor2(x: int, n: int, m: int)
     else
     {
         assert(exp(x, n * m) == exp(x, n * (m-1) + n));		
-        //factor(x, (m-1) * n, n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)
-        factor(x, n, (m-1) * n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)		
-        factor2(x, n, m - 1);	 // exp(x, n * (m-1)) = exp(exp(x, n), m - 1) -> 
+        //AssociativityLaw(x, (m-1) * n, n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)
+        AssociativityLaw(x, n, (m-1) * n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)		
+        AssociativityLaw2(x, n, m - 1);	 // exp(x, n * (m-1)) = exp(exp(x, n), m - 1) -> 
         assert(exp(exp(x, n), m - 1) * exp(x, n) == exp(exp(x, n), m));	//	exp(exp(x, n), m - 1) * exp(x, n) = exp(exp(x, n), m)
     }
 }
@@ -94,7 +94,7 @@ ensures r == exp(x2, n2)
     {			
       if (!isEven(n))
       {
-        factor2(x, 2, (n-1)/2);
+        AssociativityLaw2(x, 2, (n-1)/2);
         assert(exp(x , n) == x * exp(x*x, (n-1)/2));
         assert(y * exp(x , n) == y * x * exp(exp(x, 2), (n-1)/2));
         y, x, n := x * y, x * x, (n-1)/2;	// y * exp(x , n) == y' * exp(x', (n - 1)/2)
@@ -104,7 +104,7 @@ ensures r == exp(x2, n2)
       }
       else
       {    
-        factor2(x, 2, n/2);
+        AssociativityLaw2(x, 2, n/2);
         assert(exp(x , n) == exp(x*x, n/2));	
         assert(y * exp(x , n) == y * exp(exp(x, 2), n/2));			
           y, x, n := y, x * x, n / 2;  // y * exp(x , n) -> y' * exp(x', n/2)
