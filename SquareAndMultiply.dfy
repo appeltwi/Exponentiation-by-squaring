@@ -82,26 +82,3 @@ ensures r == exp(x2, n2)
 	assert(x * y == exp(x2, n2));
     r:= x * y; 	
 }
-
-method Evenness(n2: int)
-	requires n2 > 1
-	requires n2 == 4	
-	requires isEven(n2)
-{
-	var n := n2; 
-	var nrest := 0;
-	assert(nrest + n == n2);	
-	var x := 2;
-	while (n > 1)
-		invariant n >= 1
-		invariant nrest + n == n2
-		invariant exp(x, nrest) * exp(x, n) == exp(x, n2)			
-	{
-      if (!isEven(n))
-	  {
-        nrest, n := nrest + 1, n - 1;
-	  }
-      nrest, n := nrest + n / 2, n - n / 2;
-	}
-	assert(nrest + n == n2);
-}
