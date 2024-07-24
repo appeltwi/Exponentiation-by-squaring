@@ -3,9 +3,7 @@ function exp(x: int, n: int): int
 {
     if n == 0 then 
         1
-    else if n == 1 then
-        x
-     else 
+    else 
         x * exp(x, n-1)
 }
 
@@ -76,27 +74,32 @@ ensures r == exp(x2, n2)
     {			
       if (!isEven(n))
       {
-        AssociativityLaw2(x, 2, (n-1)/2);
-        assert(exp(x , n) == x * exp(x*x, (n-1)/2));
-        assert(y * exp(x , n) == y * x * exp(exp(x, 2), (n-1)/2));
-        y, x, n := x * y, x * x, (n-1)/2;	// y * exp(x , n) == y' * exp(x', (n - 1)/2)
+        
+        //assert(exp(x , n) == x * exp(x, n-1));
+        AssociativityLaw2(x, 2, (n-1)/2);  // exp(x,n-1) == exp(exp(x, 2), (n-1)/2)
+        //assert(exp(x,n-1) == exp(exp(x, 2), (n-1)/2));        
+        //assert(exp(x, n) == x * exp(exp(x, 2), (n-1) / 2));
+        //assert(y * exp(x , n) == y * x * exp(exp(x, 2), (n-1)/2));       
+        y, x, n := x * y, exp(x, 2), (n-1)/2;	// y * exp(x , n) == y' * exp(x', (n - 1)/2)
+        //assert(y * exp(x, n) == exp(x2, n2));        
         // y' = x * y
         // x' = x * x
-        // zz  	exp(x , n) = x * exp(x*x, (n-1)/2)
+        // zz  	exp(x , n) = x * exp(exp(x, 2), (n-1)/2)
       }
       else
       {    
-        AssociativityLaw2(x, 2, n/2);
-        assert(exp(x , n) == exp(x*x, n/2));	
-        assert(y * exp(x , n) == y * exp(exp(x, 2), n/2));			
-          y, x, n := y, x * x, n / 2;  // y * exp(x , n) -> y' * exp(x', n/2)
+        AssociativityLaw2(x, 2, n / 2); // exp(x, n) == exp(exp(x, 2), n/2)
+        //assert(exp(x , n) == exp(exp(x, 2), n / 2));	       
+        //assert(y * exp(x , n) == y * exp(exp(x, 2), n/2));			
+        y, x, n := y, exp(x, 2), n / 2;  // y * exp(x , n) -> y' * exp(x', n/2)
+        //assert(y * exp(x, n) == exp(x2, n2));           
         // y' = y
         // x' = x * x  
         // zz  	exp(x , n) = exp(x*x, n/2)
       }	   
     }
     assert(n == 1);
-    assert(x*y == exp(x2, n2));
+    //assert(x*y == exp(x2, n2));
     r:= x * y; 	
 }
 
