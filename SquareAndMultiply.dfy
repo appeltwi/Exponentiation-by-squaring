@@ -15,22 +15,6 @@ function isEven(a: int): bool
     a % 2 == 0
 }
 
-
-function exp_by_squaring2(y: int, x: int, n :int): (r :  int)
-    requires n >= 0
-    decreases n	
-  {
-    if n == 0 then y
-    else if isEven(n) then exp_by_squaring2(y, x * x, n / 2)
-    else exp_by_squaring2(x * y, x * x, (n - 1) / 2)
-  }
-
-function exp_by_squaring(x: int, n :int): (r :  int)
-    requires n >= 0
-  {
-        exp_by_squaring2(1, x , n)
-  }  
-
 method NormalExp(x: int, n: int) returns (r: int)
 requires n > 0
 ensures r == exp(x, n)
@@ -72,10 +56,8 @@ lemma AssociativityLaw2(x: int, n: int, m: int)
     else
     {
         assert(exp(x, n * m) == exp(x, n * (m-1) + n));		
-        //AssociativityLaw(x, (m-1) * n, n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)
         AssociativityLaw(x, n, (m-1) * n); // exp(x, m*n) = exp(x, n * (m-1)) * exp(x, n)		
-        AssociativityLaw2(x, n, m - 1);	 // exp(x, n * (m-1)) = exp(exp(x, n), m - 1) -> 
-        assert(exp(exp(x, n), m - 1) * exp(x, n) == exp(exp(x, n), m));	//	exp(exp(x, n), m - 1) * exp(x, n) = exp(exp(x, n), m)
+        AssociativityLaw2(x, n, m - 1);	 // exp(x, n * (m-1)) = exp(exp(x, n), m - 1) 
     }
 }
 
