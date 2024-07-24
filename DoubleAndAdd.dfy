@@ -13,20 +13,6 @@ function isEven(a: int): bool
     a % 2 == 0
 }
 
-method NormalSum(x: int, n: int) returns (r: int)
-requires n > 0
-ensures r == sum(x, n)
-{
-    r := x;
-    var tmp := n - 1;
-    while(tmp > 0)
-        invariant r == sum(x, n - tmp)
-    {
-        r := r + x;
-        tmp := tmp - 1;
-    }
-}
-
 lemma AssociativityLaw(x: int, n: int, m: int)
   requires n > 0
   requires m >= 0
@@ -59,9 +45,32 @@ lemma AssociativityLaw2(x: int, n: int, m: int)
     }
 }
 
+lemma sumtest(x: int, n: int)
+    requires n >= 0
+    ensures  x * n == sum(x,n)
+{
+
+}
+
+
+method NormalSum(x: int, n: int) returns (r: int)
+requires n > 0
+ensures r == x * n
+{
+    r := x;
+    var tmp := n - 1;
+    while(tmp > 0)
+        invariant r == sum(x, n - tmp)
+    {
+        r := r + x;
+        tmp := tmp - 1;
+    }
+    sumtest(x, n);
+}
+
 method FastSum(x2: int, n2: int) returns (r: int)
 requires n2 > 0
-ensures r == sum(x2, n2)
+ensures r ==  x2 * n2
 {
     var x := x2;
     var n := n2;
@@ -92,6 +101,7 @@ ensures r == sum(x2, n2)
       }	   
     }
     assert(n == 1);
+    sumtest(x2, n2);
     r:= x + y; 	
 }
 
