@@ -17,9 +17,10 @@ type EvenInt = x: nat | isEven(x) witness 2
 type OddInt = x: nat | !isEven(x) witness 3
 
 method NormalExp(x: int, n: int) returns (r: int)
-requires n > 0
+requires positive: n > 0
 ensures r == pow(x, n)
 {
+    reveal positive;
     r := x;
     var tmp := n - 1;
     calc
@@ -114,15 +115,14 @@ ensures r == pow(x2, n2)
         {
             y * pow(x, n); 
            { reveal pow(); }                    
-            pow(x, n - 1)*x; 
-                { AssociativityLaw2(x, 2, (n-1)/2); }             
-            pow(pow(x, 2), (n - 1)/2) * x;   
+            y * pow(x, n - 1)*x; 
+           { AssociativityLaw2(x, 2, (n-1)/2);}             
+            y * pow(pow(x, 2), (n - 1)/2) * x;   
         }       
         y, x, n := x * y, pow(x, 2), (n-1) / 2;	
       }
       else
-      { 
-        //reveal pow();             
+      {            
         AssociativityLaw2(x, 2, n / 2);	
         y, x, n := y, pow(x, 2), n / 2; 
       }	   
