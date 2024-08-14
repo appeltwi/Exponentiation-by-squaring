@@ -7,14 +7,14 @@ opaque function pow(x: int, n: int): int
         x * pow(x, n-1)
 }
 
- function isEven(a: int): bool
+opaque function isEven(a: int): bool
     requires a >= 0
 {
     a % 2 == 0
 }
 
-type EvenInt = x: nat | isEven(x) witness 2
-type OddInt = x: nat | !isEven(x) witness 3
+type EvenInt = x: nat | x % 2 == 0 witness 2
+type OddInt = x: nat | x % 2 != 0 witness 3
 
 method NormalExp(x: int, n: int) returns (r: int)
 requires P: n > 0
@@ -48,7 +48,10 @@ lemma AssociativityLaw(x: int, n: int, m: int)
     if (m == 0)
     {
         reveal npos;
-        assert(pow(x, n + 0) == pow(x,n) * pow(x, 0)) by {reveal pow();}
+        assert(pow(x, n + 0) == pow(x,n) * pow(x, 0)) by 
+        {
+            reveal pow();
+        }
     } 
     else
     {
@@ -116,7 +119,8 @@ ensures r == pow(x2, n2)
         decreases n
         invariant n > 0
         invariant y * pow(x, n) == pow(x2, n2) 	
-    {			    
+    {	
+      reveal isEven();  		    
       if (!isEven(n))
       {
         calc
@@ -130,8 +134,13 @@ ensures r == pow(x2, n2)
         y, x, n := x * y, pow(x, 2), (n-1) / 2;	
       }
       else
-      {            
-        AssociativityLaw2(x, 2, n / 2);	
+      {            	
+        calc
+        {
+            y * pow(x, n);  
+           { AssociativityLaw2(x, 2, n / 2);}             
+            y * pow(pow(x, 2), n / 2);   
+        }     
         y, x, n := y, pow(x, 2), n / 2; 
       }	   
     }   
@@ -143,4 +152,3 @@ ensures r == pow(x2, n2)
     }
     r:= x * y; 	
 }
-
