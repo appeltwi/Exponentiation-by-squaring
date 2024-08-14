@@ -31,7 +31,9 @@ ensures r == pow(x, n)
         r;
     }    
     while(tmp > 0)
+        invariant tmp >= 0
         invariant r == pow(x, n - tmp)
+        decreases tmp
     {       
         reveal pow();    
         r := r * x;
