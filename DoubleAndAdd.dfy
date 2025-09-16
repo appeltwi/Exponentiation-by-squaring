@@ -105,3 +105,27 @@ ensures r ==  x2 * n2
     r:= x + y; 	
 }
 
+method DoubleAndAddMultiply(x: int, y: int) returns (r: int)
+    requires y >= 0
+    ensures r == x * y
+{
+    var result := 0;
+    var addend := x;
+    var multiplier := y;
+
+    while (multiplier > 0)
+        invariant multiplier >= 0
+        invariant result + addend * multiplier == x * y
+        decreases multiplier
+    {
+        if (multiplier % 2 == 1) 
+        {
+            result, addend, multiplier := result + addend,  addend, multiplier - 1 ;
+        }
+        assert multiplier % 2 == 0;       
+        result, addend, multiplier := result,  addend * 2, multiplier / 2;
+    }
+    r := result;
+    return r;
+}
+
